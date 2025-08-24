@@ -2,3 +2,6 @@
 vendor
 data
 bin
+make
+.env
+/results

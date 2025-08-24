@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	amqp091 "github.com/rabbitmq/amqp091-go"
 	eventcounter "github.com/reb-felipe/eventcounter/pkg"
-	"log"
 )
 
 var (
@@ -35,12 +36,12 @@ func getChannel() (*amqp091.Channel, error) {
 	go func() {
 		for {
 			msg := <-ch
-			log.Printf("channel closed, err: %s", msg)
+			log.Printf("canal fechado, erro: %s", msg)
 		}
 	}()
 
 	if channel.IsClosed() {
-		return nil, errors.New("channel closed")
+		return nil, errors.New("canal fechado")
 	}
 
 	return channel, nil
@@ -74,7 +75,7 @@ func Publish(ctx context.Context, msgs []*eventcounter.Message) error {
 	}
 
 	if channel.IsClosed() {
-		return errors.New("channel is closed")
+		return errors.New("canal está fechado")
 	}
 
 	notifyPublish := make(chan amqp091.Confirmation, len(msgs))
@@ -86,7 +87,7 @@ func Publish(ctx context.Context, msgs []*eventcounter.Message) error {
 		for {
 			_, ok := <-notifyPublish
 			if !ok {
-				wait <- errors.New("closed")
+				wait <- errors.New("fechado")
 			}
 			count++
 			if count == len(msgs) {
@@ -103,7 +104,7 @@ func Publish(ctx context.Context, msgs []*eventcounter.Message) error {
 			ContentEncoding: "application/json",
 			Body:            []byte(fmt.Sprintf(`{"id":"%s"}`, v.UID)),
 		}); err != nil {
-			log.Printf("can`t publish message %s, err: %s", v.UID, err)
+			log.Printf("não foi possível publicar mensagem %s, erro: %s", v.UID, err)
 		}
 	}
 

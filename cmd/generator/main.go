@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	eventcounter "github.com/reb-felipe/eventcounter/pkg"
 	"log"
+
+	eventcounter "github.com/reb-felipe/eventcounter/pkg"
 )
 
 var (
@@ -41,12 +42,12 @@ func main() {
 	if publish {
 		if declareQueue {
 			if err := Declare(); err != nil {
-				log.Printf("can`t declare queue or exchange, err: %s", err.Error())
+				log.Printf("Não foi possível declarar fila ou exchange, erro: %s", err.Error())
 			}
 		}
 
 		if err := Publish(context.Background(), msgs); err != nil {
-			log.Printf("can't publish any message, err: %s", err.Error())
+			log.Printf("Não foi possível publicar mensagem, erro: %s", err.Error())
 		}
 	}
 }
