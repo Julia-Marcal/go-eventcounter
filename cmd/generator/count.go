@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	eventcounter "github.com/reb-felipe/eventcounter/pkg"
 	"log"
 	"os"
+
+	eventcounter "github.com/reb-felipe/eventcounter/pkg"
 )
 
 func CountMessages(msgs []*eventcounter.Message) map[eventcounter.EventType]map[string]int {
@@ -35,19 +36,19 @@ func Write(path string, msgs []*eventcounter.Message) {
 func createAndWriteFile(path, name string, content map[string]int) error {
 	file, err := os.Create(fmt.Sprintf("%s/%s.json", path, name))
 	if err != nil {
-		log.Printf("can't write file %s.json, err: %s", name, err)
+		log.Printf("Não foi possível escrever arquivo %s.json, erro: %s", name, err)
 		return err
 	}
 	defer file.Close()
 
 	b, err := json.MarshalIndent(content, "", "\t")
 	if err != nil {
-		log.Printf("can't marshal data for file %s.json, err: %s", name, err)
+		log.Printf("Não foi possível serializar dados para arquivo %s.json, erro: %s", name, err)
 		return err
 	}
 
 	if _, err := file.Write(b); err != nil {
-		log.Printf("can't write data for file %s.json, err: %s", name, err)
+		log.Printf("Não foi possível escrever dados para arquivo %s.json, erro: %s", name, err)
 		return err
 	}
 
