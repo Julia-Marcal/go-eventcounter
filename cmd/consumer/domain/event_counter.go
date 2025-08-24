@@ -78,6 +78,11 @@ func (c *EventCounter) MarkProcessed(messageID string) {
 	c.processed[messageID] = true
 }
 
+type UserCount struct {
+	UserID string `json:"user_id"`
+	Count  int    `json:"count"`
+}
+
 func (c *EventCounter) SaveResults() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -96,7 +101,15 @@ func (c *EventCounter) SaveResults() error {
 			data = make(map[string]int)
 		}
 
-		json_data, err := json.MarshalIndent(data, "", "  ")
+		var userCounts []UserCount
+		for userID, count := range data {
+			userCounts = append(userCounts, UserCount{
+				UserID: userID,
+				Count:  count,
+			})
+		}
+
+		json_data, err := json.MarshalIndent(userCounts, "", "  ")
 		if err != nil {
 			return fmt.Errorf("falha ao usar marshal nos dados de %s: %w", event_type, err)
 		}
