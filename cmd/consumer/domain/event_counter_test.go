@@ -307,18 +307,23 @@ func TestEventCounter_SaveResults(t *testing.T) {
 			continue
 		}
 
-		var results map[string]int
+		var results []UserCount
 		err = json.Unmarshal(data, &results)
 		if err != nil {
 			t.Errorf("Erro ao fazer unmarshal do arquivo %s: %v", filename, err)
 			continue
 		}
 
+		resultMap := make(map[string]int)
+		for _, userCount := range results {
+			resultMap[userCount.UserID] = userCount.Count
+		}
+
 		for i, user := range testUsers {
 			expectedCount := i + 1
-			if results[user] != expectedCount {
+			if resultMap[user] != expectedCount {
 				t.Errorf("Para %s em %s: esperado %d, obtido %d",
-					user, eventType, expectedCount, results[user])
+					user, eventType, expectedCount, resultMap[user])
 			}
 		}
 	}
@@ -557,15 +562,20 @@ func TestEventCounter_ConcurrentPersistence(t *testing.T) {
 			continue
 		}
 
-		var results map[string]int
+		var results []UserCount
 		err = json.Unmarshal(data, &results)
 		if err != nil {
 			t.Errorf("Erro ao fazer unmarshal do arquivo %s após salvamentos concorrentes: %v", filename, err)
 			continue
 		}
 
-		if results["user1"] != 1 {
-			t.Errorf("Para user1 em %s: esperado 1, obtido %d", eventType, results["user1"])
+		resultMap := make(map[string]int)
+		for _, userCount := range results {
+			resultMap[userCount.UserID] = userCount.Count
+		}
+
+		if resultMap["user1"] != 1 {
+			t.Errorf("Para user1 em %s: esperado 1, obtido %d", eventType, resultMap["user1"])
 		}
 
 		os.Remove(filename)
